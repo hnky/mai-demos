@@ -1,0 +1,8 @@
+jupyterlab>=4.2,<5
+ipykernel>=6.29,<7
+requests>=2.32,<3
+python-dotenv>=1.0,<2
+nbformat>=5.10,<6
+nbclient>=0.10,<1
+# Keep the shared environment compatible with local Python 3.9.
+fastjsonschema>=2.18,<2.22; python_version < "3.10"

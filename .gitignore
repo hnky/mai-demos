@@ -6,6 +6,7 @@ __pycache__/
 .env.*
 !.env.example
 samples/
+*.[wW][aA][vV]
 outputs/
 work/
 .DS_Store

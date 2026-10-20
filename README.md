@@ -9,13 +9,14 @@ resources to learn more.
 | Model | Extended information | Demo |
 | --- | --- | --- |
 | [MAI-Transcribe-2](MAI-Transcribe-2/README.md) | [Model and API information](MAI-Transcribe-2/information.md) | [Notebook](MAI-Transcribe-2/demo.ipynb) / [Instructions](MAI-Transcribe-2/demo-instructions.md) |
+| [MAI-Voice-2.1 and Flash](MAI-Voice-2.1/README.md) | [Voices, APIs, and pricing](MAI-Voice-2.1/information.md) | [Podcast notebook](MAI-Voice-2.1/demo.ipynb) / [Instructions](MAI-Voice-2.1/demo-instructions.md) |
 
 ## Run in GitHub Codespaces
 
 Open **Code > Codespaces > Create codespace** on the branch containing this
 configuration. The shared [dev container](.devcontainer/devcontainer.json)
 provides Python 3.11, the Python and Jupyter extensions, Azure CLI, FFmpeg, and
-the MAI-Transcribe-2 notebook dependencies.
+the dependencies for both notebooks.
 
 After setup finishes, open `MAI-Transcribe-2/demo.ipynb` and select
 **Python (MAI demos)** as its kernel. Follow the
@@ -23,10 +24,15 @@ After setup finishes, open `MAI-Transcribe-2/demo.ipynb` and select
 to supply Azure credentials and upload your recordings. The notebook runs
 directly in the editor; no separate JupyterLab server or public port is needed.
 
+For the podcast demo, open `MAI-Voice-2.1/demo.ipynb` with the same kernel and
+follow its [Codespaces instructions](MAI-Voice-2.1/demo-instructions.md#github-codespaces).
+It uses separate `VOICE_SPEECH_*` settings so voice and transcription resources
+are not accidentally mixed. Its core demos need no recordings.
+
 The same configuration works locally with Docker and VS Code's Dev Containers
 extension using **Dev Containers: Reopen in Container**. Codespaces compute and
-Azure transcription are billed separately; creating the environment does not
-provision an Azure resource or run transcription.
+Azure speech usage are billed separately; creating the environment does not
+provision an Azure resource, run transcription, synthesize speech, or upload audio.
 
 ## Repository structure
 
@@ -40,6 +46,16 @@ MAI-Transcribe-2/
   requirements.txt   # Demo-specific Python dependencies, when needed
   .env.example       # Safe configuration template, when needed
   tests/             # Demo-specific checks, when needed
+MAI-Voice-2.1/
+  README.md
+  information.md
+  demo.ipynb
+  demo-instructions.md
+  requirements.txt
+  .env.example
+  scripts.json       # Podcast dialogue and solo welcomes
+  voice_demo.py      # Synthesis and gated personal-voice API helpers
+  tests/
 ```
 
 Each demo is self-contained. Follow its `demo-instructions.md` for dependencies,
