@@ -1,0 +1,29 @@
+{
+  "name": "Microsoft AI demos",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {}
+  },
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "VIRTUAL_ENV": "/home/vscode/.venvs/mai-demos",
+    "PATH": "/home/vscode/.venvs/mai-demos/bin:${containerEnv:PATH}"
+  },
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "waitFor": "postCreateCommand",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-toolsai.jupyter"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/home/vscode/.venvs/mai-demos/bin/python",
+        "jupyter.notebookFileRoot": "${fileDirname}"
+      }
+    }
+  }
+}
