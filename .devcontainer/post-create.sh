@@ -11,6 +11,7 @@ fi
 
 "${venv_dir}/bin/python" -m pip install \
     -r MAI-Transcribe-2/requirements.txt \
+    -r MAI-Transcribe-2-Streaming/requirements.txt \
     -r MAI-Voice-2.1/requirements.txt
 "${venv_dir}/bin/python" -m ipykernel install --user \
     --name mai-demos --display-name "Python (MAI demos)"

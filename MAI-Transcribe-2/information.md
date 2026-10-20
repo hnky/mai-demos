@@ -403,8 +403,9 @@ The streaming model is in **public preview**, without an SLA, as of October 20,
 2026. Its documentation does not recommend production use. Its configuration and
 capabilities should not be assumed to match the file model, and repeatedly
 uploading small files is not equivalent to using its streaming protocol.
-The notebook in this repository focuses on completed recordings; the following
-details explain the separate integration needed for live captions.
+The notebook in this folder covers completed recordings. Realtime has its own
+[demo and extended information](../MAI-Transcribe-2-Streaming/README.md).
+The following comparison explains why the two integrations are separate.
 
 ### Regions and integration choices
 

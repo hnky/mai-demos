@@ -41,6 +41,11 @@ you want: comparisons make requests directly, and the optional export cell saves
 files when executed. Keywords and the Dutch clip's path are edited in their own
 examples, not in a separate settings block.
 
+For realtime captions, see the separate
+[MAI-Transcribe-2-Streaming demo](../MAI-Transcribe-2-Streaming/README.md).
+It has its own notebook, requirements, and connection settings; this demo does
+not import or run it.
+
 ## Learn more
 
 - [MAI-Transcribe-2 documentation and API examples](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe)
@@ -48,5 +53,6 @@ examples, not in a separate settings block.
 - [Supported Azure Speech regions](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/regions?tabs=llmspeech)
 - [MAI-Transcribe-2 model card](https://microsoft.ai/pdf/MAI-Transcribe-2-Model-Card.pdf)
 - [Microsoft Foundry Speech-to-text playground](https://aka.ms/foundry-speech-to-text)
+- [MAI-Transcribe-2-Streaming Realtime guide](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/mai-transcribe-2-streaming-realtime)
 
 [All model demos](../README.md)

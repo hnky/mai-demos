@@ -161,6 +161,18 @@ class NotebookTests(unittest.TestCase):
         self.assertIn("the baseline only", cells["export-heading"].source)
         self.assertIn("../MAI-Voice-2.1/demo.ipynb", cells["wrap-up"].source)
 
+    def test_notebook_remains_file_only(self):
+        code_cells = [cell for cell in self.notebook.cells if cell.cell_type == "code"]
+        self.assertEqual(code_cells[-1].id, "export")
+        for cell in code_cells:
+            self.assertNotIn("live_captions", cell.source)
+            self.assertNotIn("AZURE_MAI_", cell.source)
+        self.assertFalse((ROOT / "live_captions.py").exists())
+        self.assertFalse((ROOT / "live_captions.js").exists())
+        requirements = (ROOT / "requirements.txt").read_text()
+        self.assertNotIn("anywidget", requirements)
+        self.assertNotIn("websockets", requirements)
+
     def test_dotenv_preserves_existing_environment(self):
         (Path(self.temp.name) / ".env").write_text(
             "SPEECH_ENDPOINT=https://dotenv.cognitiveservices.azure.com\n"

@@ -1,0 +1,11 @@
+jupyterlab>=4.2,<5
+ipykernel>=6.29,<7
+azure-identity>=1.17,<2
+python-dotenv>=1.0,<2
+ipywidgets>=8.1,<9
+anywidget>=0.9,<1
+websockets>=15,<16
+nbformat>=5.10,<6
+nbclient>=0.10,<1
+# Version 2.22 uses Python 3.10 union syntax even when installed on Python 3.9.
+fastjsonschema>=2.18,<2.22; python_version < "3.10"

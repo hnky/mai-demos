@@ -4,8 +4,9 @@
 
 Turn an **A Bit of AI** episode recording into a readable, navigable transcript.
 The notebook follows Henk and Amy's conversation through an editor's workflow
-using your own Azure resource and permitted recordings. These steps do not cover
-the separate streaming model.
+using your own Azure resource and permitted recordings. For realtime captions,
+use the separate [Streaming demo](../MAI-Transcribe-2-Streaming/README.md);
+no streaming setup is needed for this notebook.
 
 ## GitHub Codespaces
 
