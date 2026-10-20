@@ -45,8 +45,8 @@ their own file's directory as the working directory so `.env` and `samples/`
 resolve correctly. Setup only installs tools and dependencies; it makes no
 transcription requests.
 
-Samples, credentials, private working documents, and generated outputs are
-Git-ignored and are not included in a fresh codespace. Upload them again when
+Samples, credentials, and generated outputs are Git-ignored and are not included
+in a fresh codespace. Upload recordings again when
 needed, and save any local-only files you want to keep before deleting a
 codespace. Codespaces compute costs are separate from Azure transcription.
 
@@ -200,10 +200,3 @@ responses, and execute a copy of the whole notebook using generated silent WAV
 fixtures and explicitly mocked Azure calls. They require no Azure credentials,
 make no billable requests, and do not overwrite the notebook with test outputs.
 They do not establish actual model access, accuracy, or production latency.
-
-## Working documents
-
-Keep internal research, brainstorming, draft scripts, storyboards, and rehearsal
-notes in `work/` inside this demo. That directory is Git-ignored and local only.
-Reader-facing model information, notebook documentation, and other public demo
-materials belong outside it.

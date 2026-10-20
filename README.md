@@ -40,15 +40,10 @@ MAI-Transcribe-2/
   requirements.txt   # Demo-specific Python dependencies, when needed
   .env.example       # Safe configuration template, when needed
   tests/             # Demo-specific checks, when needed
-  .env               # Local credentials; Git-ignored
-  samples/           # Local input audio/video/data; Git-ignored
-  outputs/           # Generated local results; Git-ignored
-  work/              # Internal research, brainstorms, draft scripts; Git-ignored
 ```
 
-Each demo is self-contained. Run its notebook with that demo directory as the
-working directory so `.env`, `samples/`, and `outputs/` resolve consistently.
-Follow the demo's `demo-instructions.md` for dependencies and execution instructions.
+Each demo is self-contained. Follow its `demo-instructions.md` for dependencies,
+configuration, recordings, and execution instructions.
 
 ## Adding a demo
 
@@ -62,17 +57,4 @@ shared dev-container setup alongside its own instructions.
 Structure each demo README in this order: a brief model introduction, a link to
 extended information, the feature demo with a link to its instructions, then
 learning resources. Keep detailed setup steps out of the introductory README.
-Write `information.md` as a reader-facing article about the model, not as a
-research report or presentation plan. Keep the underlying research in `work/`.
-
-## Local-only working documents
-
-Use a `work/` folder inside each demo for internal research, brainstorming,
-unfinished video scripts, storyboards, and rehearsal notes. A root `work/` folder
-may hold cross-demo notes. All `work/` folders are excluded from Git. Keep
-reader-facing articles and public demo instructions outside those folders.
-
-Credentials, input samples, generated output, virtual environments, and notebook
-checkpoints are also ignored. Git ignores do not hide content embedded inside a
-notebook: clear saved audio, transcripts, credentials, and private outputs before
-sharing or committing it.
+Write `information.md` as an in-depth, reader-facing article about the model.
