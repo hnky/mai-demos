@@ -17,6 +17,9 @@ and prepare readable text for the episode page.
 [Open the podcast demo notebook](demo.ipynb) |
 [Setup and demo instructions](demo-instructions.md)
 
+[Watch the notebook walkthrough on YouTube](https://www.youtube.com/watch?v=E2jf-X_z99k)
+(6 minutes, in English with Henk's consented AI-generated narration).
+
 | Story step | Model feature |
 | --- | --- |
 | Make the first record of the episode | Verbatim transcription and measured request time |

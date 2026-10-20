@@ -16,6 +16,14 @@ The demos follow **A Bit of AI**: Voice turns a script into the podcast opening;
 Transcribe turns a recorded conversation into an editor's transcript; Streaming
 is a separate experimental live-caption demo. Each has its own notebook and setup.
 
+## Video walkthroughs
+
+Follow the notebooks on YouTube. Both videos are in English and use Henk's
+consented AI-generated narration.
+
+- [MAI-Transcribe-2: from recording to working transcript](https://www.youtube.com/watch?v=E2jf-X_z99k) (6 minutes)
+- [MAI-Voice-2.1 and Flash: from script to generated speech](https://www.youtube.com/watch?v=IJdToJGbUdo) (7 minutes 14 seconds)
+
 ## Run in GitHub Codespaces
 
 Open **Code > Codespaces > Create codespace** on the branch containing this

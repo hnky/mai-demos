@@ -22,6 +22,9 @@ Create the opening of **A Bit of AI**, a podcast hosted by Henk and Amy:
 **[Open the notebook](demo.ipynb)** |
 **[Setup and running instructions](demo-instructions.md)**
 
+[Watch the notebook walkthrough on YouTube](https://www.youtube.com/watch?v=IJdToJGbUdo)
+(7 minutes 14 seconds, in English with Henk's consented AI-generated narration).
+
 Run it locally or in the repository's shared GitHub Codespaces environment.
 The notebook shows the SSML, `post_ssml(...)`, and audio playback explicitly.
 The helper hides the URL, headers, and HTTP plumbing, then reports character
