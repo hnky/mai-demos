@@ -8,8 +8,12 @@ resources to learn more.
 
 | Model | Extended information | Demo |
 | --- | --- | --- |
-| [MAI-Transcribe-2](MAI-Transcribe-2/README.md) | [Model and API information](MAI-Transcribe-2/information.md) | [Notebook](MAI-Transcribe-2/demo.ipynb) / [Instructions](MAI-Transcribe-2/demo-instructions.md) |
+| [MAI-Transcribe-2](MAI-Transcribe-2/README.md) | [Model and API information](MAI-Transcribe-2/information.md) | [Podcast transcript notebook](MAI-Transcribe-2/demo.ipynb) / [Instructions](MAI-Transcribe-2/demo-instructions.md) |
 | [MAI-Voice-2.1 and Flash](MAI-Voice-2.1/README.md) | [Voices, APIs, and pricing](MAI-Voice-2.1/information.md) | [Podcast notebook](MAI-Voice-2.1/demo.ipynb) / [Instructions](MAI-Voice-2.1/demo-instructions.md) |
+
+Both demos follow **A Bit of AI**: Voice turns a script into the podcast opening;
+Transcribe turns a recorded conversation into an editor's transcript. Each demo
+works independently.
 
 ## Run in GitHub Codespaces
 
@@ -24,7 +28,7 @@ After setup finishes, open `MAI-Transcribe-2/demo.ipynb` and select
 to supply Azure credentials and upload your recordings. The notebook runs
 directly in the editor; no separate JupyterLab server or public port is needed.
 
-For the podcast demo, open `MAI-Voice-2.1/demo.ipynb` with the same kernel and
+For the voice-generation demo, open `MAI-Voice-2.1/demo.ipynb` with the same kernel and
 follow its [Codespaces instructions](MAI-Voice-2.1/demo-instructions.md#github-codespaces).
 It uses separate `VOICE_SPEECH_*` settings so voice and transcription resources
 are not accidentally mixed. Its core demos need no recordings.

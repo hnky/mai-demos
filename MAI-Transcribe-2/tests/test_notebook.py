@@ -1,3 +1,4 @@
+import ast
 import copy
 import io
 import json
@@ -18,17 +19,17 @@ ROOT = Path(__file__).resolve().parents[1]
 NOTEBOOK = ROOT / "demo.ipynb"
 RESPONSE = {
     "durationMilliseconds": 2000,
-    "combinedPhrases": [{"text": "Hello Contoso. Goedemorgen."}],
+    "combinedPhrases": [{"text": "Welcome Amy. Goedemorgen."}],
     "phrases": [
         {
             "speaker": 0,
             "locale": "en",
             "offsetMilliseconds": 100,
             "durationMilliseconds": 800,
-            "text": "Hello Contoso.",
+            "text": "Welcome Amy.",
             "words": [
-                {"text": "Hello", "offsetMilliseconds": 100, "durationMilliseconds": 300},
-                {"text": "Contoso.", "offsetMilliseconds": 400, "durationMilliseconds": 500},
+                {"text": "Welcome", "offsetMilliseconds": 100, "durationMilliseconds": 300},
+                {"text": "Amy.", "offsetMilliseconds": 400, "durationMilliseconds": 500},
             ],
         },
         {
@@ -64,13 +65,8 @@ class NotebookTests(unittest.TestCase):
                 "demo-imports", "demo-helpers"
             }:
                 exec(compile(cell.source, str(NOTEBOOK), "exec"), cls.demo.__dict__)
-        cls.demo.MODEL = "MAI-Transcribe-2"
-        cls.demo.API_VERSION = "2025-10-15"
-        cls.demo.MAX_DEMO_BYTES = 20 * 1024 * 1024
         cls.demo.SPEECH_ENDPOINT = "https://demo.cognitiveservices.azure.com"
-        cls.demo.AUTH_MODE = "key"
         cls.demo.SETTINGS = {}
-        cls.demo._prompted_key = None
         cls.demo._credential = None
 
     @classmethod
@@ -93,7 +89,12 @@ class NotebookTests(unittest.TestCase):
 
     def test_notebook_is_valid_and_has_no_saved_outputs(self):
         nbformat.validate(self.notebook)
+        self.assertNotIn("widgets", self.notebook.metadata)
+        self.assertNotIn("data:audio", NOTEBOOK.read_text())
         for cell in self.notebook.cells:
+            self.assertFalse(cell.get("attachments"))
+            for setting in ("RUN_COMPARISONS", "EXPORT_RESULTS", "AUTH_MODE", "DUTCH_AUDIO_PATH"):
+                self.assertNotIn(setting, cell.source)
             if cell.cell_type == "code":
                 self.assertIsNone(cell.execution_count)
                 self.assertEqual(cell.outputs, [])
@@ -122,18 +123,43 @@ class NotebookTests(unittest.TestCase):
         self.assertEqual(
             configuration["SPEECH_ENDPOINT"], "https://dotenv.cognitiveservices.azure.com"
         )
-        self.assertEqual(configuration["AUTH_MODE"], "key")
+        self.assertEqual(configuration["SETTINGS"]["SPEECH_KEY"], "offline-dotenv-secret")
         self.assertEqual(configuration["AUDIO_PATH"], Path("samples/dutch meeting.wav"))
         self.assertNotIn("offline-dotenv-secret", output)
 
-    def test_configuration_selects_dutch_sample_only_when_present(self):
+    def test_configuration_has_only_connection_and_main_recording_settings(self):
+        source = next(c.source for c in self.notebook.cells if c.id == "configuration")
+        assignments = {
+            node.targets[0].id for node in ast.parse(source).body
+            if isinstance(node, ast.Assign)
+        }
+        self.assertEqual(assignments, {"SETTINGS", "SPEECH_ENDPOINT", "AUDIO_PATH"})
+
+    def test_recording_path_is_explicit_without_automatic_file_selection(self):
+        samples = Path(self.temp.name) / "samples"
+        samples.mkdir()
+        for locale in ("en", "nl"):
+            make_wav(samples / f"meeting-{locale}.wav")
         configuration, _ = self.run_configuration({})
-        self.assertIsNone(configuration["DUTCH_AUDIO_PATH"])
-        sample = Path(self.temp.name) / "samples" / "meeting-nl.wav"
-        sample.parent.mkdir()
-        make_wav(sample)
-        configuration, _ = self.run_configuration({})
-        self.assertEqual(configuration["DUTCH_AUDIO_PATH"], sample)
+        self.assertEqual(configuration["AUDIO_PATH"], Path("samples/a-bit-of-ai-en.wav"))
+        for name in ("meeting-en.wav", "my-episode.wav"):
+            configuration, _ = self.run_configuration({"AUDIO_FILE": f"samples/{name}"})
+            self.assertEqual(configuration["AUDIO_PATH"], Path(f"samples/{name}"))
+
+    def test_podcast_keywords_and_editorial_story(self):
+        cells = {cell.id: cell for cell in self.notebook.cells}
+        keywords = ast.literal_eval(ast.parse(cells["keywords"].source).body[0].value)
+        self.assertEqual(keywords, [
+            "A Bit of AI", "Henk Boelman", "Amy", "Microsoft Foundry", "MAI-Transcribe", "AgentCon",
+        ])
+        instructions = (ROOT / "demo-instructions.md").read_text()
+        for term in keywords:
+            self.assertIn(term, instructions)
+        self.assertIn("A Bit of AI", cells["intro"].source)
+        self.assertIn("anonymous", cells["inspect-heading"].source.lower())
+        self.assertIn("not a summary", cells["styles-heading"].source)
+        self.assertIn("the baseline only", cells["export-heading"].source)
+        self.assertIn("../MAI-Voice-2.1/demo.ipynb", cells["wrap-up"].source)
 
     def test_dotenv_preserves_existing_environment(self):
         (Path(self.temp.name) / ".env").write_text(
@@ -150,7 +176,7 @@ class NotebookTests(unittest.TestCase):
         self.assertEqual(
             configuration["SPEECH_ENDPOINT"], "https://environment.cognitiveservices.azure.com"
         )
-        self.assertEqual(configuration["AUTH_MODE"], "entra")
+        self.assertEqual(configuration["SETTINGS"]["SPEECH_KEY"], "")
         self.assertEqual(configuration["AUDIO_PATH"], Path("samples/environment.wav"))
 
     def test_dotenv_edits_take_effect_without_kernel_restart(self):
@@ -201,8 +227,8 @@ class NotebookTests(unittest.TestCase):
                 with patch("sys.stdout", io.StringIO()):
                     exec(configuration_cell.source, namespace)
         self.assertEqual(namespace["SPEECH_ENDPOINT"], "")
-        self.assertEqual(namespace["AUTH_MODE"], "entra")
-        self.assertEqual(namespace["AUDIO_PATH"], Path("samples/meeting-en.wav"))
+        self.assertNotIn("SPEECH_KEY", namespace["SETTINGS"])
+        self.assertEqual(namespace["AUDIO_PATH"], Path("samples/a-bit-of-ai-en.wav"))
 
     def test_endpoint_rejects_unsafe_or_wrong_resource_urls(self):
         self.assertEqual(
@@ -253,27 +279,18 @@ class NotebookTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.demo.request_definition(phrases=[" "])
 
-    def test_hidden_key_and_missing_key(self):
-        with patch.dict("os.environ", {}, clear=True):
-            with patch.object(self.demo.getpass, "getpass", return_value="test-secret") as prompt:
-                self.demo._prompted_key = None
-                try:
-                    self.assertEqual(
-                        self.demo.auth_headers(),
-                        {"Ocp-Apim-Subscription-Key": "test-secret"},
-                    )
-                    self.demo.auth_headers()
-                    prompt.assert_called_once()
-                finally:
-                    self.demo._prompted_key = None
-            with patch.object(self.demo.getpass, "getpass", return_value=" "):
-                with self.assertRaises(ValueError):
-                    self.demo.auth_headers()
+    def test_configured_key_does_not_acquire_cli_credentials(self):
+        with patch.object(self.demo, "SETTINGS", {"SPEECH_KEY": " test-secret "}):
+            with patch("azure.identity.AzureCliCredential") as credential:
+                self.assertEqual(
+                    self.demo.auth_headers(), {"Ocp-Apim-Subscription-Key": "test-secret"}
+                )
+                credential.assert_not_called()
 
     def test_entra_credential_scope(self):
         credential = Mock()
         credential.get_token.return_value.token = "offline-token"
-        with patch.object(self.demo, "AUTH_MODE", "entra"):
+        with patch.object(self.demo, "SETTINGS", {"SPEECH_KEY": ""}):
             with patch.object(self.demo, "_credential", credential):
                 self.assertEqual(
                     self.demo.auth_headers(), {"Authorization": "Bearer offline-token"}
@@ -404,7 +421,7 @@ class NotebookTests(unittest.TestCase):
     def test_full_notebook_executes_offline(self):
         self.execute_notebook(comparisons=True, dutch=True, exports=True)
 
-    def test_default_notebook_executes_offline(self):
+    def test_core_demo_cells_execute_offline(self):
         self.execute_notebook(comparisons=True, dutch=False, exports=False)
 
     def test_one_request_notebook_handles_no_speech(self):
@@ -418,18 +435,21 @@ class NotebookTests(unittest.TestCase):
     def execute_notebook(self, comparisons, dutch, exports, payload=None):
         payload = RESPONSE if payload is None else payload
         notebook = copy.deepcopy(self.notebook)
+        skipped = set()
+        if not comparisons:
+            skipped.update({"styles", "keywords"})
+        if not dutch:
+            skipped.add("dutch")
+        if not exports:
+            skipped.add("export")
+        notebook.cells = [cell for cell in notebook.cells if cell.id not in skipped]
         samples = Path(self.temp.name) / "samples"
         samples.mkdir()
-        make_wav(samples / "meeting-en.wav")
-        make_wav(samples / "meeting-nl.wav")
-        dutch_path_code = "Path('samples/meeting-nl.wav')" if dutch else "None"
+        make_wav(samples / "a-bit-of-ai-en.wav")
+        make_wav(samples / "a-bit-of-ai-nl.wav")
         setup = nbformat.v4.new_code_cell(
             "SPEECH_ENDPOINT = 'https://offline.cognitiveservices.azure.com'\n"
-            "AUTH_MODE = 'key'\n"
             "SETTINGS['SPEECH_KEY'] = 'offline-test-key'\n"
-            f"DUTCH_AUDIO_PATH = {dutch_path_code}\n"
-            f"RUN_COMPARISONS = {comparisons!r}\n"
-            f"EXPORT_RESULTS = {exports!r}\n"
             "recorded_requests = []\n"
             f"fixture_response = {payload!r}\n"
             "class OfflineResponse:\n"
@@ -454,18 +474,18 @@ class NotebookTests(unittest.TestCase):
             f"assert len(recorded_requests) == {1 + 2 * comparisons + dutch}\n"
             "assert recorded_requests[0]['enhancedMode']['model'] == 'MAI-Transcribe-2'\n"
             "assert 'phraseList' not in recorded_requests[0]\n"
-            "if RUN_COMPARISONS:\n"
+            f"if {comparisons!r}:\n"
             "    assert recorded_requests[1]['enhancedMode']['modelOptions']['transcribeStyle'] == 'clean'\n"
-            "    assert recorded_requests[2]['phraseList']['phrases'] == KEYWORDS\n"
+            "    assert recorded_requests[2]['phraseList']['phrases'] == keywords\n"
             "    assert clean is not None and hinted is not None\n"
             "else:\n"
-            "    assert clean is None and hinted is None\n"
-            "if DUTCH_AUDIO_PATH is not None:\n"
+            "    assert 'clean' not in globals() and 'hinted' not in globals()\n"
+            f"if {dutch!r}:\n"
             "    assert 'locales' not in recorded_requests[-1] and dutch is not None\n"
             "else:\n"
-            "    assert dutch is None\n"
+            "    assert 'dutch' not in globals()\n"
             f"assert len(words) == {sum(len(segment.get('words', [])) for segment in payload['phrases'])}\n"
-            "if EXPORT_RESULTS:\n"
+            f"if {exports!r}:\n"
             "    assert (export_directory / 'response.json').is_file()\n"
             "else:\n"
             "    assert not Path('outputs').exists()\n"
@@ -476,7 +496,7 @@ class NotebookTests(unittest.TestCase):
         install(prefix=str(kernel_prefix), kernel_name="mai-offline-test")
         with patch.dict("os.environ", {
             "JUPYTER_PATH": str(kernel_prefix / "share" / "jupyter"),
-            "AUDIO_FILE": str(samples / "meeting-en.wav"),
+            "AUDIO_FILE": str(samples / "a-bit-of-ai-en.wav"),
         }):
             NotebookClient(
                 notebook,

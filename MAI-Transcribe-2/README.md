@@ -8,23 +8,38 @@ specialized vocabulary.
 [Read the extended information](information.md) for model capabilities, API
 details, language support, regions, pricing, limitations, and source references.
 
-## Demo
+## Demo: turn A Bit of AI into a readable episode
 
-[Open the feature demo notebook](demo.ipynb) |
+Henk and Amy have recorded an episode of **A Bit of AI**. Follow the editor's
+workflow: turn that conversation into a transcript, revisit important moments,
+and prepare readable text for the episode page.
+
+[Open the podcast demo notebook](demo.ipynb) |
 [Setup and demo instructions](demo-instructions.md)
 
-| Feature | What the notebook demonstrates |
+| Story step | Model feature |
 | --- | --- |
-| Transcription | Turn a recording into text and measure request time |
-| Speaker diarization | Inspect anonymous speaker labels in a multi-person recording |
-| Word timestamps | Navigate the recording with an interactive word-playback slider |
-| Clean versus verbatim | Compare readable output with fillers and corrections preserved |
-| Keyword hints | Compare recognition with and without domain-specific terms |
-| Multilingual recognition | Transcribe Dutch with automatic language detection |
+| Make the first record of the episode | Verbatim transcription and measured request time |
+| Follow the handoffs between hosts | Anonymous speaker diarization, not identity recognition |
+| Find a name or correction in the recording | Word timestamps and local excerpt playback |
+| Prepare a readable episode-page draft | Clean versus verbatim on the same audio |
+| Check the show name and AI terminology | Keyword hints without forced replacements |
+| Include Henk's Dutch welcome | Automatic language detection, not translation |
+| Hand source material to the editor | Optional baseline TXT/JSON exports |
 
-The notebook also includes local audio playback and opt-in TXT/JSON exports.
-This is **file transcription**, not the separate streaming model. Azure access
-and your own permitted audio recordings are required.
+Use a permitted podcast excerpt or record the fictional rehearsal script in the
+instructions. No audio is bundled. This is **file transcription**, not the separate
+streaming model, automatic show-note generation, or publication of an episode page.
+Review the output before sharing.
+
+The [MAI-Voice demo](../MAI-Voice-2.1/README.md) gives A Bit of AI a voice.
+This demo turns the recorded conversation back into usable text. Both work
+independently; no voice cloning or consent-recording upload is needed here.
+
+Setup only needs connection details and the main recording path. Run the cells
+you want: comparisons make requests directly, and the optional export cell saves
+files when executed. Keywords and the Dutch clip's path are edited in their own
+examples, not in a separate settings block.
 
 ## Learn more
 

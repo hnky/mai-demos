@@ -12,6 +12,12 @@ multilingual recognition with speaker labels, timestamps, and a choice of
 transcription styles. The result can be more than a block of text: it can become
 a way to explore a conversation.
 
+The accompanying demo follows **A Bit of AI**, the podcast hosted by Henk and
+Amy. After recording, an editor needs a readable transcript, reliable spelling
+of the show's AI vocabulary, and a way to jump back to a specific moment.
+That production story connects the model's features without treating transcripts
+as automatically correct or confusing them with generated show notes.
+
 The availability, prices, and API details below reflect Microsoft's documentation
 as of **October 20, 2026**. Announcement benchmarks are attributed to their
 publishers rather than presented as measurements from the accompanying notebook.
@@ -139,8 +145,9 @@ settings.
 
 Product names, acronyms, and domain-specific terms can be difficult to recognize
 from sound alone. Keyword hints let an application provide relevant vocabulary
-through `phraseList.phrases`. For example, a recording about an AI project might
-include hints for "Microsoft Foundry" and "MAI-Transcribe".
+through `phraseList.phrases`. An A Bit of AI episode might include hints for
+"A Bit of AI", "Henk Boelman", "Microsoft Foundry", "MAI-Transcribe", and "AgentCon".
+Only supply terms relevant to the actual recording.
 
 Hints bias recognition toward likely terms; they are not replacements that force
 particular words into the transcript. Their effect depends on the recording,
@@ -604,13 +611,23 @@ and do not trigger irreversible actions from provisional speech hypotheses.
 Anonymous speaker labels likewise should not be used as biometric identity
 verification.
 
-## Explore the features in the notebook
+## Follow the podcast story in the notebook
 
-The [feature notebook](demo.ipynb) follows a recording from playback to a
-speaker-labeled transcript, then uses word timestamps to revisit individual
-moments. It compares clean and verbatim output, adds keyword hints, and supports
-a Dutch recording to explore automatic language detection. Optional TXT and
-JSON exports make the results available for further use.
+The [podcast notebook](demo.ipynb) starts after Henk and Amy record an
+**A Bit of AI** conversation. A verbatim baseline captures the episode; anonymous
+speaker labels help follow the handoffs, and word timestamps let the editor
+revisit a name or correction. Clean output provides a readable transcript draft,
+while keyword hints independently test the show's vocabulary. An optional
+Dutch welcome demonstrates language detection without translation.
+
+Optional TXT/JSON exports hand off the baseline transcript and real service
+metadata. They do not generate summaries, identify the hosts by name, or publish
+an episode page. Those remain editorial or downstream steps.
+
+The [MAI-Voice demo](../MAI-Voice-2.1/README.md) tells the companion story:
+turn a script into the podcast opening. The transcription demo works independently
+with permitted recorded audio. Synthetic inputs should be disclosed and kept
+distinct from evaluations of recognition on natural speech.
 
 Follow the [demo instructions](demo-instructions.md) to configure Azure access
 and prepare your recordings. For more examples and model details, continue with

@@ -2,8 +2,10 @@
 
 [Model introduction](README.md) | [Extended information](information.md) | [Notebook](demo.ipynb)
 
-Set up and run the file-transcription feature demo with your own Azure resource
-and permitted recordings. These steps do not cover the separate streaming model.
+Turn an **A Bit of AI** episode recording into a readable, navigable transcript.
+The notebook follows Henk and Amy's conversation through an editor's workflow
+using your own Azure resource and permitted recordings. These steps do not cover
+the separate streaming model.
 
 ## GitHub Codespaces
 
@@ -18,13 +20,13 @@ No local Python installation or separate JupyterLab server is needed.
 2. Open the repository on the branch containing the dev-container configuration,
    choose **Code > Codespaces > Create codespace**, and wait for setup to finish.
 3. Upload your permitted audio through the Explorer into
-   `MAI-Transcribe-2/samples/`. Name the main recording `meeting-en.wav`, or set
+   `MAI-Transcribe-2/samples/`. Name the main recording `a-bit-of-ai-en.wav`, or set
    `AUDIO_PATH` in the notebook to its relative path. Name an optional Dutch
-   recording `meeting-nl.wav`.
+   welcome `a-bit-of-ai-nl.wav`.
 4. Open `MAI-Transcribe-2/demo.ipynb`, choose **Select Kernel**, and select
    **Python (MAI demos)**. If it is not listed, select the Python environment at
    `/home/vscode/.venvs/mai-demos/bin/python`.
-5. Run the notebook from the top. Review the request counts and costs in
+5. Run setup and the demo cells you want to present. Review the request counts and costs in
    [Run and present](#run-and-present) before executing transcription cells.
 
 Codespaces supplies the secrets as environment variables, which the notebook
@@ -88,16 +90,15 @@ You need an Azure Speech/Foundry resource with access to MAI-Transcribe-2 in a
 The notebook uses the `2025-10-15` fast-transcription API and explicitly selects
 `MAI-Transcribe-2`. This surface is not available on the Speech F0 tier.
 
-Choose one authentication method:
+Authentication is automatic; there is no authentication-mode setting:
 
-- **Entra ID:** install the Azure CLI if needed (the dev container includes it),
-  run `az login` locally or `az login --use-device-code` in Codespaces, and ensure the
-  signed-in identity has the required resource permissions, such as
-  **Cognitive Services Speech User**. Leave `AUTH_MODE = "entra"` in the notebook.
-- **Resource key:** set `SPEECH_KEY` in `.env` or supply it through your
-  environment's secret-management mechanism. The notebook selects key
-  authentication automatically. Alternatively, set `AUTH_MODE` to `"key"` in
-  the configuration cell to enter the key through a hidden prompt.
+- **Resource key:** set `SPEECH_KEY` in `.env` or through your environment's secret
+  store. The helper uses the configured key without prompting.
+- **Entra ID:** leave the key unset, run `az login` locally or
+  `az login --use-device-code` in Codespaces, and give the signed-in identity the
+  required resource permissions, such as **Cognitive Services Speech User**.
+  The helper then uses Azure CLI credentials. It does not silently switch to
+  another method if the selected credential fails.
 
 Never paste a real key into a notebook cell, commit it, or display request headers.
 The configuration cell reads `.env` fresh from the notebook's working directory
@@ -114,41 +115,55 @@ recordings to the kernel's filesystem; no local microphone is required.
 ## Prepare the recordings
 
 Place a **30-90 second mono, 16-bit PCM WAV** recording at
-`samples/meeting-en.wav`, or change `AUDIO_PATH` in the configuration cell.
+`samples/a-bit-of-ai-en.wav`, or change `AUDIO_PATH` in the configuration cell.
 You can also set `AUDIO_FILE` in `.env` or the environment.
 MP3 and FLAC work with the transcription helper, but the word-excerpt player
 requires PCM WAV. Compressed-audio playback depends on the notebook frontend.
 The notebook enforces a conservative **20 MiB demo limit**, not the service's
 maximum file size.
 
-Record two consenting speakers reading an original fictional conversation such as:
+Use a short permitted excerpt of the podcast, or ask two consenting speakers to
+read this **fictional rehearsal script**. These are scripted roles, not a claim
+that the real hosts said these lines. Listen for the handoffs, fillers, correction,
+and names: the same moments carry the story through each notebook section.
 
-> Speaker A: Okay, um, let's review the Contoso demo. We will use Microsoft Foundry
-> and MAI-Transcribe to turn this recording into a transcript.
+> **Henk:** Hi everyone, and welcome to A Bit of AI! I'm Henk Boelman.
 >
-> Speaker B: Sounds good. The rehearsal is on Thursday. Sorry, I mean Friday,
-> at ten thirty. We should check the speaker labels and the timestamps.
+> **Amy:** And I'm Amy. Today we're looking at Microsoft Foundry and
+> MAI-Transcribe. What happens after we finish recording an episode?
 >
-> Speaker A: Right. And, uh, the customer name is Contoso, not Fabrikam.
-> Let's keep those names in our keyword list.
+> **Henk:** Well, um, we need a transcript so listeners can find the parts they
+> care about. Remember that conversation about AgentCon?
 >
-> Speaker B: I'll prepare the audio today. The transcript should keep this
-> correction in verbatim mode, but clean mode can remove the filler words.
+> **Amy:** Yes! That episode goes out on Thursday. Sorry, I mean Friday.
+> Let's make sure the transcript keeps that correction.
 >
-> Speaker A: Great. We also need a Dutch recording. After the rehearsal,
-> we'll check any mistakes together before sharing the results.
+> **Henk:** Exactly. And, uh, the episode page should spell A Bit of AI and
+> AgentCon correctly. We can check the names against the recording.
+>
+> **Amy:** So first we listen, then check who spoke, find the right moment, and
+> prepare a readable transcript. No complicated jargon.
+>
+> **Henk:** And we'll include a Dutch welcome too. Grab a coffee, and let's get
+> the episode ready.
 
-For the optional Dutch section, record your own Dutch speech and place it at
-`samples/meeting-nl.wav`. The configuration cell selects this file automatically
-when it exists; set `DUTCH_AUDIO_PATH = None` to skip it. A starting script:
+For the optional Dutch welcome, record your own Dutch speech at
+`samples/a-bit-of-ai-nl.wav`. This short script comes from the podcast opening:
 
-> Goedemorgen, vandaag bespreken we de demonstratie voor Contoso. We gebruiken
-> Microsoft Foundry om deze opname om te zetten naar tekst. De repetitie is op
-> donderdag, sorry, op vrijdag om half elf. Controleer de namen en de tijdstempels.
-> Daarna vergelijken we de oorspronkelijke tekst met de opgeschoonde versie.
+> Hallo allemaal, en welkom bij een nieuwe aflevering van A Bit of AI!
+> Ik ben Henk Boelman, en ik ben blij dat je er weer bij bent.
 
-Audio is transmitted to Azure. Use fictional, non-sensitive content you have
-permission to process. `samples/` and `outputs/` are ignored by Git.
+Set the Dutch path directly in its demonstration cell, or skip that cell.
+There is no automatic file discovery: missing files raise an error before upload.
+Existing filenames such as `samples/meeting-en.wav` and `samples/meeting-nl.wav`
+still work when explicitly selected. `AUDIO_FILE` in `.env` continues to set the
+main recording, so there is no need to rename an already configured recording.
+
+Audio is transmitted to Azure. Use non-sensitive recordings you have permission
+to process. **Do not use a voice-cloning consent recording as the demo input.**
+No recordings are bundled; WAV files, `samples/`, and `outputs/` are Git-ignored.
+If you use audio generated by the Voice demo, disclose that it is synthetic
+and do not present it as an accuracy test on natural conversation.
 
 ### Extract or convert audio with FFmpeg
 
@@ -157,34 +172,68 @@ video or audio recording to the mono, 16-bit, 16 kHz WAV format used by the
 notebook's word-excerpt player:
 
 ```bash
-ffmpeg -n -i samples/input.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le samples/meeting-en.wav
+ffmpeg -n -i samples/input.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le samples/a-bit-of-ai-en.wav
 ```
 
 Replace `samples/input.mp4` with your uploaded file's path. The `-n` option
 refuses to overwrite an existing output. For a Dutch recording, use
-`samples/meeting-nl.wav` as the output path. Conversion happens inside the
+`samples/a-bit-of-ai-nl.wav` as the output path. Conversion happens inside the
 container; transcription sends the resulting recording to Azure.
 
 ## Run and present
 
-Run the notebook from top to bottom. The default performs **three paid requests**
-for the main recording: baseline verbatim, clean, and verbatim with keyword hints.
-Set `RUN_COMPARISONS = False` for a one-request walkthrough. The Dutch section
-makes one extra request only when its path is configured. No requests retry
-automatically; a timeout does not imply the service did not process or bill it.
+Frame the walkthrough as getting an A Bit of AI recording ready for its editor,
+not as six unrelated recognition tests:
 
-The word slider replays local excerpts without additional API requests.
-`EXPORT_RESULTS` defaults to `False`; enable it to save the baseline transcript,
-raw response, and sanitized request/timing metadata in a unique output folder.
+| Notebook scene | What to show |
+| --- | --- |
+| Listen to the recorded episode | Identify a handoff, a hesitation, and a name to revisit |
+| Make the first transcript | One explicit MAI-Transcribe-2 request, with verbatim text and metadata |
+| Follow the hosts | Compare anonymous speaker labels with what you actually hear; do not assume speaker 0 is Henk |
+| Revisit an editorial question | Use a word timestamp to replay a name or correction without another API call |
+| Prepare the episode-page draft | Compare clean and verbatim on the same audio; clean is not a summary |
+| Check the show's vocabulary | Compare the verbatim baseline against keyword-hinted verbatim output |
+| Include the Dutch welcome | Let the service detect the language and keep the transcript in Dutch |
+| Hand off the source material | Optionally export the baseline TXT, JSON response, and request metadata |
+
+Use hints that are actually spoken in your clip. Defaults match the rehearsal
+script: A Bit of AI, Henk Boelman, Amy, Microsoft Foundry, MAI-Transcribe, and
+AgentCon. A correct baseline may not change when hints are added.
+
+Run setup, then execute the cells you want to demonstrate. There are no run
+switches. Baseline verbatim, clean, and keyword-hinted verbatim each make **one
+paid request**: three for the full main-recording walkthrough. For one request,
+run the baseline and skip the clean and keyword comparison cells.
+
+The optional Dutch cell makes **one extra request** when run; set its path in
+that cell. Skip it if you do not have a Dutch clip. **Run All attempts all four
+requests and runs the export cell if it completes.** A missing Dutch clip stops
+execution rather than being silently skipped. No requests retry automatically;
+a timeout does not imply the service did not process or bill it.
+
+The word slider replays local excerpts without additional API requests. Run the
+optional export cell to save the baseline transcript, raw response, and sanitized
+request/timing metadata in a unique output folder; skip it to avoid writing files.
 Exports do not include audio or credentials, but do contain speech-derived data.
+They export **the baseline only**; the clean, hinted, and Dutch results remain
+separate notebook variables. Generating summaries, show notes, chapter titles, or
+caption files would be a separate step, not an output this notebook invents.
 
 The notebook keeps no fabricated fallback transcripts. It needs your actual
 Azure access and recordings for a live presentation. Rehearse with the same
 resource, samples, machine, and network you will use on stage.
 
+Setup only loads the connection details and main audio path. Model/API constants
+stay in the helper, authentication is selected from your credentials, and the
+keyword list and Dutch path sit directly beside the examples that use them.
+
 **Before sharing or committing an executed notebook:** restart the kernel,
 clear all outputs, save, and inspect the diff. Audio playback embeds recordings
 in notebook outputs; tables and widget outputs also retain transcript content.
+
+The [MAI-Voice notebook](../MAI-Voice-2.1/demo.ipynb) is the companion production
+story: write a podcast opening and give it a voice. This notebook starts from a
+recording instead. Neither demo needs the other's Azure resource or execution.
 
 ## Offline checks
 
